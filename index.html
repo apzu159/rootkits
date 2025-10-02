@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rootkits: La Amenaza Invisible</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #c2202094 0%, #ff000061 100%);
+            border-bottom: 3px solid #ff0000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 0, 0, 0.03) 10px,
+                rgba(255, 0, 0, 0.03) 20px
+            );
+            animation: scan 20s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50%, 50%); }
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #ff6b6b;
+            position: relative;
+            z-index: 1;
+        }
+
+        .warning-banner {
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid #ff0000;
+            padding: 15px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #ff0000;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 0, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #ff6b6b;
+            font-size: 1.5em;
+            margin: 20px 0 10px 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #ff0000, #ff6b6b);
+        }
+
+        .timeline-item {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -46px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff0000;
+            border: 3px solid #1a1a2e;
+        }
+
+        .timeline-year {
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: rgba(255, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .card h4 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .example-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .example-title {
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .tab.active {
+            background: #ff0000;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .impact-meter {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .impact-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6b6b);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            transition: width 2s ease;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            margin-top: 50px;
+            border-top: 2px solid #ff0000;
+        }
+
+        .code-block {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔴 ROOTKITS</h1>
+        <p class="subtitle">La Amenaza Invisible del Ciberespacio</p>
+    </header>
+
+    <div class="container">
+        <div class="warning-banner">
+            <strong>⚠️ ADVERTENCIA:</strong> Esta página contiene información educativa sobre malware. El conocimiento aquí presentado debe ser utilizado únicamente con fines de seguridad informática y protección de sistemas.
+        </div>
+
+        <!-- DEFINICIÓN -->
+        <section class="section">
+            <h2>📚 Definición</h2>
+            <p>Un <strong>rootkit</strong> es un tipo de software malicioso diseñado para obtener acceso privilegiado (a nivel de "root" o administrador) a un sistema informático mientras oculta su presencia y la de otros programas maliciosos. El término proviene de la combinación de "root" (el usuario con máximos privilegios en sistemas Unix/Linux) y "kit" (conjunto de herramientas).</p>
+            
+            <div class="card-grid" style="margin-top: 20px;">
+                <div class="card">
+                    <h4>🎭 Sigilo</h4>
+                    <p>Se ocultan del sistema operativo, antivirus y usuarios</p>
+                </div>
+                <div class="card">
+                    <h4>🔑 Privilegios</h4>
+                    <p>Obtienen acceso a nivel de administrador o kernel</p>
+                </div>
+                <div class="card">
+                    <h4>🛡️ Persistencia</h4>
+                    <p>Permanecen activos incluso después de reinicios</p>
+                </div>
+                <div class="card">
+                    <h4>🚪 Backdoor</h4>
+                    <p>Permiten acceso remoto no autorizado al sistema</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- HISTORIA -->
+        <section class="section">
+            <h2>📜 Historia de los Rootkits</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-year">1990s</span>
+                    <p><strong>Nacimiento del término:</strong> Los rootkits aparecieron inicialmente en sistemas Unix/Linux como herramientas legítimas de administración que posteriormente fueron adoptadas por atacantes.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="timeline-year">1999</span>
+                    <p><strong>NTRootkit:</strong> Greg Hoglund lanza uno de los primeros rootkits para Windows NT, demostrando que estos ataques no eran exclusivos de Unix.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="timeline-year">2005</span>
+                    <p><strong>Sony BMG Scandal:</strong> Sony distribuyó CDs de música con un rootkit DRM que se instalaba secretamente en computadoras Windows, causando un escándalo mundial de seguridad.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="timeline-year">2008-2010</span>
+                    <p><strong>TDL/TDSS:</strong> Aparición de rootkits altamente sofisticados capaces de infectar el Master Boot Record (MBR) y sobrevivir a reinstalaciones del sistema operativo.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="timeline-year">2011</span>
+                    <p><strong>ZeroAccess:</strong> Uno de los rootkits más prolíficos, infectó millones de computadoras para crear botnets masivas.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="timeline-year">2017-Presente</span>
+                    <p><strong>Era Moderna:</strong> Rootkits UEFI y de firmware que operan por debajo del sistema operativo, siendo extremadamente difíciles de detectar y eliminar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FUNCIONAMIENTO -->
+        <section class="section">
+            <h2>⚙️ Funcionamiento</h2>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('usermode')">User-Mode</div>
+                <div class="tab" onclick="showTab('kernelmode')">Kernel-Mode</div>
+                <div class="tab" onclick="showTab('bootkit')">Bootkit</div>
+                <div class="tab" onclick="showTab('firmware')">Firmware</div>
+            </div>
+
+            <div id="usermode" class="tab-content active">
+                <h3>Rootkits en Modo Usuario</h3>
+                <p>Operan con privilegios de usuario normal y son los más fáciles de detectar:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Hooking de APIs:</strong> Interceptan llamadas a funciones del sistema</li>
+                    <li><strong>DLL Injection:</strong> Inyectan código malicioso en procesos legítimos</li>
+                    <li><strong>Limitaciones:</strong> Pueden ser detectados por software de seguridad actualizado</li>
+                </ul>
+                <div class="code-block">
+// Ejemplo de hooking de API<br>
+Original: ReadFile() → Sistema<br>
+Modificado: ReadFile() → Rootkit → Sistema<br>
+(El rootkit intercepta y oculta archivos)
+                </div>
+            </div>
+
+            <div id="kernelmode" class="tab-content">
+                <h3>Rootkits en Modo Kernel</h3>
+                <p>Los más peligrosos, operan con privilegios máximos del sistema:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Drivers maliciosos:</strong> Se instalan como controladores del sistema</li>
+                    <li><strong>SSDT Hooking:</strong> Modifican la System Service Descriptor Table</li>
+                    <li><strong>DKOM:</strong> Direct Kernel Object Manipulation para ocultar procesos</li>
+                    <li><strong>Control total:</strong> Pueden modificar cualquier aspecto del sistema</li>
+                </ul>
+            </div>
+
+            <div id="bootkit" class="tab-content">
+                <h3>Bootkits (MBR/VBR)</h3>
+                <p>Infectan el proceso de arranque del sistema:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Master Boot Record:</strong> Se cargan antes que el sistema operativo</li>
+                    <li><strong>Persistencia extrema:</strong> Sobreviven a formateos y reinstalaciones</li>
+                    <li><strong>Ejemplos:</strong> TDL4, Rovnix, Olmasco</li>
+                    <li><strong>Detección:</strong> Requiere análisis del sector de arranque</li>
+                </ul>
+            </div>
+
+            <div id="firmware" class="tab-content">
+                <h3>Rootkits de Firmware/UEFI</h3>
+                <p>El nivel más profundo de infección:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>BIOS/UEFI:</strong> Se alojan en el firmware de la placa base</li>
+                    <li><strong>Invisibilidad total:</strong> Operan por debajo del sistema operativo</li>
+                    <li><strong>Eliminación:</strong> Requiere reflasheo del firmware</li>
+                    <li><strong>Ejemplos:</strong> LoJax (2018), MosaicRegressor (2020)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PROPAGACIÓN -->
+        <section class="section">
+            <h2>🌐 Métodos de Propagación</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h4>📧 Phishing</h4>
+                    <p>Correos electrónicos con archivos adjuntos maliciosos o enlaces que descargan el rootkit al hacer clic.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🔓 Exploits</h4>
+                    <p>Aprovechan vulnerabilidades en software sin parches para instalar el rootkit sin interacción del usuario.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>💿 Medios Físicos</h4>
+                    <p>USBs, CDs o DVDs infectados que ejecutan el rootkit al conectarse o insertarse.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🌐 Drive-by Downloads</h4>
+                    <p>Sitios web comprometidos que descargan automáticamente el malware al visitarlos.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🎭 Ingeniería Social</h4>
+                    <p>Engañan al usuario para que instale software que parece legítimo pero contiene el rootkit.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🔗 Supply Chain</h4>
+                    <p>Compromiso de software legítimo antes de su distribución, como el caso de Sony BMG.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- IMPACTO -->
+        <section class="section">
+            <h2>💥 Impacto y Consecuencias</h2>
+            
+            <h3>Impacto Individual</h3>
+            <div class="impact-meter">
+                <div class="impact-fill" style="width: 95%;">95% Crítico</div>
+            </div>
+            <ul style="margin-left: 20px;">
+                <li>🔐 <strong>Robo de credenciales:</strong> Contraseñas, datos bancarios, información personal</li>
+                <li>👁️ <strong>Espionaje:</strong> Captura de pantalla, keylogging, acceso a cámara/micrófono</li>
+                <li>💳 <strong>Fraude financiero:</strong> Acceso no autorizado a cuentas bancarias</li>
+                <li>🗂️ <strong>Pérdida de datos:</strong> Archivos personales comprometidos o encriptados</li>
+            </ul>
+
+            <h3 style="margin-top: 30px;">Impacto Empresarial</h3>
+            <div class="impact-meter">
+                <div class="impact-fill" style="width: 98%;">98% Catastrófico</div>
+            </div>
+            <ul style="margin-left: 20px;">
+                <li>💰 <strong>Pérdidas económicas:</strong> Millones en costos de remediación y tiempo de inactividad</li>
+                <li>🏢 <strong>Espionaje corporativo:</strong> Robo de propiedad intelectual y secretos comerciales</li>
+                <li>📉 <strong>Daño reputacional:</strong> Pérdida de confianza de clientes e inversores</li>
+                <li>⚖️ <strong>Consecuencias legales:</strong> Multas por incumplimiento de normativas de protección de datos</li>
+                <li>🌐 <strong>Compromiso de infraestructura:</strong> Acceso a sistemas críticos y redes completas</li>
+            </ul>
+
+            <h3 style="margin-top: 30px;">Impacto Global</h3>
+            <div class="impact-meter">
+                <div class="impact-fill" style="width: 85%;">85% Severo</div>
+            </div>
+            <ul style="margin-left: 20px;">
+                <li>🌍 <strong>Ciberguerra:</strong> Herramienta para ataques entre naciones</li>
+                <li>🔌 <strong>Infraestructura crítica:</strong> Riesgo para servicios esenciales (energía, agua, salud)</li>
+                <li>💻 <strong>Botnets masivas:</strong> Millones de dispositivos comprometidos</li>
+            </ul>
+        </section>
+
+        <!-- EJEMPLOS DE INFECCIÓN -->
+        <section class="section">
+            <h2>🦠 Ejemplos Reales de Infección</h2>
+
+            <div class="example-box">
+                <div class="example-title">1. Sony BMG Rootkit (2005) - XCP</div>
+                <p><strong>Descripción:</strong> Sony BMG incluyó software de protección de copia (XCP) en más de 22 millones de CDs de música. Al insertar el CD en una PC con Windows, se instalaba automáticamente un rootkit que ocultaba archivos y procesos.</p>
+                <p><strong>Vector:</strong> CDs de música legítimos</p>
+                <p><strong>Impacto:</strong> Demandas colectivas, retirada de millones de CDs, daño reputacional masivo</p>
+                <p><strong>Vulnerabilidad:</strong> Además, el rootkit creaba vulnerabilidades de seguridad que podían ser explotadas por otro malware</p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">2. Stuxnet (2010)</div>
+                <p><strong>Descripción:</strong> Aunque técnicamente un gusano, Stuxnet utilizaba componentes rootkit para ocultarse. Diseñado para sabotear el programa nuclear iraní.</p>
+                <p><strong>Vector:</strong> USB y vulnerabilidades zero-day de Windows</p>
+                <p><strong>Impacto:</strong> Daño físico a centrifugadoras nucleares, primer ciberarma conocida</p>
+                <p><strong>Sofisticación:</strong> Utilizó 4 exploits zero-day y certificados digitales robados</p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">3. TDL-4/TDSS (2008-2011)</div>
+                <p><strong>Descripción:</strong> Bootkit que infectaba el Master Boot Record, considerado uno de los más sofisticados de su época.</p>
+                <p><strong>Vector:</strong> Drive-by downloads, archivos adjuntos maliciosos</p>
+                <p><strong>Impacto:</strong> Infectó millones de computadoras creando una botnet masiva</p>
+                <p><strong>Características:</strong> Capaz de sobrevivir a reinstalaciones del SO, instalaba malware adicional</p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">4. ZeroAccess (2011-2013)</div>
+                <p><strong>Descripción:</strong> Rootkit de modo kernel que creó una de las botnets más grandes de la historia.</p>
+                <p><strong>Vector:</strong> Exploits de navegadores, software pirata</p>
+                <p><strong>Impacto:</strong> Más de 9 millones de computadoras infectadas en su pico</p>
+                <p><strong>Uso:</strong> Click fraud, minería de Bitcoin, descarga de malware adicional</p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">5. Necurs (2012-2020)</div>
+                <p><strong>Descripción:</strong> Rootkit de modo kernel usado para crear una botnet masiva de spam.</p>
+                <p><strong>Vector:</strong> Campañas de phishing, kit de exploits</p>
+                <p><strong>Impacto:</strong> Responsable de enviar millones de correos de spam diarios distribuyendo ransomware y troyanos bancarios</p>
+                <p><strong>Desmantelamiento:</strong> Microsoft coordinó su derribo en 2020</p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">6. LoJax (2018) - Rootkit UEFI</div>
+                <p><strong>Descripción:</strong> Primer rootkit UEFI encontrado en estado salvaje, atribuido al grupo APT28 (Fancy Bear).</p>
+                <p><strong>Vector:</strong> Campaña de spear-phishing dirigida</p>
+                <p><strong>Impacto:</strong> Persistencia extrema, sobrevive a reemplazo de disco duro</p>
+                <p><strong>Eliminación:</strong> Requiere reflasheo del firmware UEFI</p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">7. Zacinlo (2012-2018)</div>
+                <p><strong>Descripción:</strong> Rootkit multifunción que combinaba técnicas de bootkit con certificados digitales legítimos robados.</p>
+                <p><strong>Vector:</strong> Software crackeado y keygens</p>
+                <p><strong>Impacto:</strong> Ad fraud, robo de credenciales, proxy malicioso</p>
+                <p><strong>Duración:</strong> Operó durante 6 años sin ser detectado</p>
+            </div>
+        </section>
+
+        <!-- PROTECCIÓN -->
+        <section class="section">
+            <h2>🛡️ Protección y Detección</h2>
+            
+            <h3>Medidas Preventivas</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>✅ Actualizaciones</h4>
+                    <p>Mantener sistema operativo y software actualizados</p>
+                </div>
+                <div class="card">
+                    <h4>🔒 Secure Boot</h4>
+                    <p>Activar arranque seguro UEFI</p>
+                </div>
+                <div class="card">
+                    <h4>🛡️ Antivirus Actualizado</h4>
+                    <p>Usar soluciones de seguridad con protección anti-rootkit</p>
+                </div>
+                <div class="card">
+                    <h4>👤 Principio de Menor Privilegio</h4>
+                    <p>No usar cuenta de administrador para tareas cotidianas</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">Herramientas de Detección</h3>
+            <ul style="margin-left: 20px;">
+                <li>🔍 <strong>GMER:</strong> Escáner especializado en rootkits para Windows</li>
+                <li>🔍 <strong>Rootkit Revealer:</strong> Herramienta de Sysinternals</li>
+                <li>🔍 <strong>Malwarebytes Anti-Rootkit:</strong> Detección y eliminación</li>
+                <li>🔍 <strong>chkrootkit:</strong> Para sistemas Linux/Unix</li>
+                <li>🔍 <strong>ESET Rootkit Detector:</strong> Análisis profundo del sistema</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p><strong>⚠️ Recuerda:</strong> Esta información es para fines educativos sobre seguridad informática.</p>
+            <p style="margin-top: 10px;">El conocimiento sobre amenazas es fundamental para la ciberseguridad.</p>
+            <p style="margin-top: 20px; color: #ff6b6b;">🔴 Página Educativa sobre Rootkits - 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Ocultar todos los contenidos
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Desactivar todas las pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Activar la pestaña y contenido seleccionados
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Animación de los medidores de impacto al cargar
+        window.addEventListener('load', () => {
+            const fills = document.querySelectorAll('.impact-fill');
+            fills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
